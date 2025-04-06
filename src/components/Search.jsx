@@ -32,9 +32,13 @@ const Search = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full md:w-96">
-      <div className="flex">
+    <form onSubmit={handleSubmit} className="max-w-full md:max-w-96">
+      <label className='text-nowrap text-lg' htmlFor="searchType">Search by:</label>
+      <div className="flex shadow-md">
         <select
+          name="searchType"
+          id="searchType"
+          defaultValue=''
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
           className="bg-white text-gray-800 px-2 rounded-l"
@@ -47,7 +51,7 @@ const Search = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={searchType === 'name' ? "Search products..." : "Enter barcode..."}
-          className="flex-grow p-2 focus:outline-none"
+          className="bg-zinc-200 text-black flex-grow p-2 focus:outline-none"
         />
         <button
           type="submit"
