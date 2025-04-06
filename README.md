@@ -2,7 +2,7 @@
 
 A modern, responsive web application that allows users to search, filter, and explore detailed information about food products using the OpenFoodFacts API.
 
-![Project Banner](/home/madjob/repos/foodExplorer/public/readme-pic.png)
+![Project Banner](./public/readme-pic.png)
 
 ## ✨ Features
 
@@ -14,6 +14,9 @@ A modern, responsive web application that allows users to search, filter, and ex
 - ♾️ **Infinite Scroll**: Load more products as you browse
 - 🔍 **Detailed Product View**: See ingredients, nutrition, and more
 - 🛒 **Shopping Cart**: Collect interesting products with quantity management
+
+## ⌚ Time taken to build:
+This project was completed in under 12 hours. Admittedly a lot of help was taken from [docs](#Acknowledgements) [blog posts](https://dev.to/clarenceg01/building-a-shopping-cart-using-react-redux-toolkit-1fd5), [youtube tutorials](https://youtu.be/NJ1inoC1L1k?si=VTR6J5oRkbjpd08D) and [claude](https://claude.ai).
 
 ## 🛠️ Technology Stack
 
