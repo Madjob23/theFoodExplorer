@@ -9,7 +9,7 @@ import ProductDetail from './features/products/ProductDetail';
 function App() {
   return (
     <Provider store={store}>
-      <Router>
+      <Router basename='/theFoodExplorer'>
         <div className="min-h-screen bg-gray-100">
           <Header />
           <Routes>
