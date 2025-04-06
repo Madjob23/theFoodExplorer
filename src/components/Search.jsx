@@ -9,7 +9,7 @@ import {
 
 const Search = () => {
   const [input, setInput] = useState('');
-  const [searchType, setSearchType] = useState('name'); // 'name' or 'barcode'
+  const [searchType, setSearchType] = useState('name');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -32,8 +32,8 @@ const Search = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-full md:max-w-96">
-      <label className='text-nowrap text-lg' htmlFor="searchType">Search by:</label>
+    <form onSubmit={handleSubmit} className="w-full md:max-w-96">
+      <label className='block text-lg mb-1' htmlFor="searchType">Search by:</label>
       <div className="flex shadow-md">
         <select
           name="searchType"
@@ -41,7 +41,7 @@ const Search = () => {
           defaultValue=''
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
-          className="bg-white text-gray-800 px-2 rounded-l"
+          className=" shrink-0 bg-white text-gray-800 px-2 rounded-l min-w-16"
         >
           <option value="name">Name</option>
           <option value="barcode">Barcode</option>
@@ -50,8 +50,8 @@ const Search = () => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={searchType === 'name' ? "Search products..." : "Enter barcode..."}
-          className="bg-zinc-200 text-black flex-grow p-2 focus:outline-none"
+          placeholder={searchType === 'name' ? "Search..." : "Barcode..."}
+          className="bg-zinc-200 text-black flex-grow p-2 focus:outline-none min-w-0"
         />
         <button
           type="submit"
