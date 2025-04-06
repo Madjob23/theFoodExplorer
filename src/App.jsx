@@ -5,6 +5,8 @@ import { store } from './app/store';
 import Header from './components/Header';
 import ProductsPage from './features/products/ProductsPage';
 import ProductDetail from './features/products/ProductDetail';
+import CartPage from './features/cart/CartPage';
+import CartButton from './components/CartButton';
 
 function App() {
   return (
@@ -15,7 +17,9 @@ function App() {
           <Routes>
             <Route path="/" element={<ProductsPage />} />
             <Route path="/product/:barcode" element={<ProductDetail />} />
+            <Route path="/cart" element={<CartPage />} />
           </Routes>
+          <CartButton />
         </div>
       </Router>
     </Provider>
