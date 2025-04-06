@@ -2,7 +2,7 @@
 
 A modern, responsive web application that allows users to search, filter, and explore detailed information about food products using the OpenFoodFacts API.
 
-![Project Banner](https://via.placeholder.com/1200x400?text=Food+Product+Explorer)
+![Project Banner](/home/madjob/repos/foodExplorer/public/readme-pic.png)
 
 ## ✨ Features
 
@@ -13,6 +13,7 @@ A modern, responsive web application that allows users to search, filter, and ex
 - 📱 **Responsive Design**: Works seamlessly on mobile and desktop
 - ♾️ **Infinite Scroll**: Load more products as you browse
 - 🔍 **Detailed Product View**: See ingredients, nutrition, and more
+- 🛒 **Shopping Cart**: Collect interesting products with quantity management
 
 ## 🛠️ Technology Stack
 
@@ -65,6 +66,7 @@ some other best practices I got my hands on during this:
 
 - **Performance**: Infinite scrolling requires careful implementation to avoid performance issues
 - **User Experience**: Clear loading states and error handling significantly improve usability
+- **Persistent Storage**: Using localStorage to maintain cart state between sessions
 
 ## 🏗️ Project Structure
 
@@ -73,6 +75,8 @@ src/
 ├── app/
 │   └── store.js             # Redux store configuration
 ├── components/              # Reusable UI components
+│   ├── AddToCartButton.jsx  # Cart interaction component
+│   ├── CartButton.jsx       # Floating cart access button
 │   ├── CategoryFilter.jsx   # Category filtering component
 │   ├── Header.jsx           # App header with navigation
 │   ├── ProductCard.jsx      # Card to display product preview
@@ -80,10 +84,13 @@ src/
 │   ├── Search.jsx           # Search functionality
 │   └── Sort.jsx             # Sorting options component
 ├── features/                # Feature-based organization
-│   └── products/
-│       ├── productsSlice.js # Redux slice for products
-│       ├── ProductsPage.jsx # Main product listing page
-│       └── ProductDetail.jsx # Detailed product view
+│   ├── products/
+│   │   ├── productsSlice.js # Redux slice for products
+│   │   ├── ProductsPage.jsx # Main product listing page
+│   │   └── ProductDetail.jsx # Detailed product view
+│   └── cart/
+│       ├── cartSlice.js     # Redux slice for cart management
+│       └── CartPage.jsx     # Cart page with quantity controls
 ├── hooks/                   # Custom React hooks
 │   └── useInfiniteScroll.js # Hook for infinite scrolling
 ├── App.jsx                  # Main app component with routing
@@ -92,8 +99,10 @@ src/
 
 ## 🔄 State Management
 
-The application uses Redux Toolkit for state management. The main slice is `productsSlice.js`, which handles:
+The application uses Redux Toolkit for state management with two main slices:
 
+### Products Slice (`productsSlice.js`)
+Handles:
 - Product listing data
 - Search queries
 - Filtering options
@@ -101,6 +110,15 @@ The application uses Redux Toolkit for state management. The main slice is `prod
 - Pagination state
 - Loading states
 - API request status
+
+### Cart Slice (`cartSlice.js`)
+Handles:
+- Cart items collection
+- Item quantities
+- Total items count
+- Add/remove operations
+- Quantity adjustments
+- Cart persistence with localStorage
 
 ### Key State Elements
 
@@ -115,6 +133,10 @@ The application uses Redux Toolkit for state management. The main slice is `prod
     searchQuery: '',        // Current search term
     selectedCategory: '',   // Selected category for filtering
     sortOption: 'popularity' // Current sort option
+  },
+  cart: {
+    items: [],              // Array of cart items with quantities
+    totalItems: 0           // Total number of items in cart
   }
 }
 ```
@@ -186,6 +208,47 @@ function Search() {
 }
 ```
 
+### Cart Functionality
+
+The application includes a comprehensive cart system that allows users to:
+
+```jsx
+// AddToCartButton.jsx
+function AddToCartButton({ product, size = "normal", showSeeInCart = true }) {
+  const dispatch = useDispatch();
+  const cartItem = useSelector(selectItemInCart(product.code));
+  const [quantity, setQuantity] = useState(1);
+  
+  const handleAddToCart = () => {
+    dispatch(addToCart({ product, quantity }));
+    setQuantity(1);
+  };
+  
+  // For products already in cart, show remove and 'see in cart' options
+  return (
+    <div>
+      {cartItem ? (
+        <div>
+          <button onClick={handleRemoveFromCart}>
+            Remove from Cart
+          </button>
+          
+          {showSeeInCart && (
+            <Link to="/cart">
+              See in Cart
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div>
+          {/* Quantity controls and Add button */}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
 ### Infinite Scroll
 
 The application implements infinite scrolling to load more products as the user scrolls down:
@@ -224,6 +287,7 @@ When a user clicks on a product, they are taken to a detailed view that displays
 - Ingredients list
 - Nutritional values
 - Labels (vegan, gluten-free, etc.)
+- Add to Cart functionality with quantity control
 
 ## 🎨 Styling and UI
 
@@ -234,6 +298,8 @@ The application uses Tailwind CSS for styling, providing a clean, modern interfa
 - **Category Tags**: Visual representation of product categories
 - **Loading States**: Clear indicators when content is loading
 - **Responsive Grid**: Adapts to different screen sizes automatically
+- **Floating Cart Button**: Always-accessible cart with item count
+- **Quantity Controls**: Intuitive increment/decrement buttons for cart items
 
 ## 🧪 Testing
 
@@ -259,6 +325,12 @@ To test the application manually:
    - Click on products to view detailed information
    - Verify that all product details load correctly
 
+6. **Cart Functionality**:
+   - Add products to cart with different quantities
+   - Remove products from cart
+   - Adjust quantities in the cart page
+   - Verify cart persists between page refreshes
+
 ## 🚦 Performance Optimization
 
 The application implements several performance optimizations:
@@ -269,6 +341,7 @@ The application implements several performance optimizations:
 - **Efficient Rendering**: React components only re-render when necessary
 - **Pagination**: Data is fetched in manageable chunks
 - **Cached Results**: Previous search results are preserved in state
+- **LocalStorage**: Cart state persists between sessions without server calls
 
 ## 📱 Responsive Design
 
@@ -283,7 +356,7 @@ The application is fully responsive and works well on:
 
 - The OpenFoodFacts API can be slow or unresponsive at times, I had to face a lot of issues with CORS error and 'ERR_CONNECTION_TIMED_OUT'.
 - Some products may have incomplete data
-- Category filtering is limited to the top categories due to API constraints
+- Category filtering is limited to the top categories due to API constraints, kept getting CORS error when trying to get the list of all categories.
 - Image quality varies across products, and sometimes might not be available at all.
 
 ## 🔮 Future Improvements
