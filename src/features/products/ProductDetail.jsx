@@ -6,6 +6,7 @@ import {
   selectSelectedProduct,
   selectSelectedProductStatus
 } from './productSlice.js';
+import AddToCartButton from '../../components/AddToCartButton';
 
 const ProductDetail = () => {
   const { barcode } = useParams();
@@ -116,6 +117,10 @@ const ProductDetail = () => {
                 </div>
               </div>
             )}
+
+            <div className="mt-6">
+              <AddToCartButton product={product} showSeeInCart={false} />
+            </div>
           </div>
         </div>
         

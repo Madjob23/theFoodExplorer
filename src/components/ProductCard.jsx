@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import AddToCartButton from './AddToCartButton';
 
 const ProductCard = ({ product }) => {
   const imageUrl = product.image_url || 'https://via.placeholder.com/200x200?text=No+Image';
@@ -26,38 +27,43 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <Link to={`/product/${product.code}`} className="block">
-      <div className="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-        <div className="h-48 overflow-hidden">
-          <img 
-            src={imageUrl} 
-            alt={product.product_name || 'Food product'} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="p-4">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="font-bold text-lg truncate">
-              {product.product_name || 'Unknown Product'}
-            </h3>
-            {getNutritionBadge(product.nutrition_grade_fr)}
+    <div className="flex flex-col justify-between rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+      <Link to={`/product/${product.code}`} className="block">
+        <div className="overflow-hidden">
+          <div className="h-48 overflow-hidden">
+            <img 
+              src={imageUrl} 
+              alt={product.product_name || 'Food product'} 
+              className="w-full h-full object-cover"
+            />
           </div>
-          
-          {product.categories_tags && (
-            <p className="text-sm text-gray-600 mb-2 truncate">
-              {product.categories_tags[0]?.replace('en:', '')}
-            </p>
-          )}
-          
-          {product.ingredients_text && (
-            <p className="text-sm text-gray-700 line-clamp-2">
-              {product.ingredients_text.substring(0, 100)}
-              {product.ingredients_text.length > 100 ? '...' : ''}
-            </p>
-          )}
+          <div className="p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-bold text-lg truncate">
+                {product.product_name || 'Unknown Product'}
+              </h3>
+              {getNutritionBadge(product.nutrition_grade_fr)}
+            </div>
+            
+            {product.categories_tags && (
+              <p className="text-sm text-gray-600 mb-2 truncate">
+                {product.categories_tags[0]?.replace('en:', '')}
+              </p>
+            )}
+            
+            {product.ingredients_text && (
+              <p className="text-sm text-gray-700 line-clamp-2">
+                {product.ingredients_text.substring(0, 100)}
+                {product.ingredients_text.length > 100 ? '...' : ''}
+              </p>
+            )}
+          </div>
         </div>
+      </Link>
+      <div className="px-4 pb-4">
+      <AddToCartButton product={product} size="small" />
       </div>
-    </Link>
+    </div>
   );
 };
 
