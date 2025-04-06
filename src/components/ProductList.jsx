@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchProducts,
@@ -10,7 +10,8 @@ import {
   selectSelectedCategory,
   selectSortOption,
   setPage
-} from '../features/products/productSlice';
+} from '../features/products/productsSlice';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import ProductCard from './ProductCard';
 
 const ProductList = () => {
@@ -18,26 +19,24 @@ const ProductList = () => {
   const products = useSelector(selectAllProducts);
   const status = useSelector(selectProductsStatus);
   const error = useSelector(selectProductsError);
-  const page = useSelector(selectCurrentPage);
-  const query = useSelector(selectSearchQuery);
-  const category = useSelector(selectSelectedCategory);
-  const sort = useSelector(selectSortOption);
+  const currentPage = useSelector(selectCurrentPage);
+  const searchQuery = useSelector(selectSearchQuery);
+  const selectedCategory = useSelector(selectSelectedCategory);
+  const sortOption = useSelector(selectSortOption);
 
-  const observer = useRef();
-  const lastProductElementRef = useCallback(node => {
-    if (status === 'loading') return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && products.length > 0) {
-        dispatch(setPage(page + 1));
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [status, page, dispatch, products.length]);
+  const loadMoreProducts = useCallback(() => {
+    if (status !== 'loading') {
+      dispatch(setPage(currentPage + 1));
+      dispatch(fetchProducts({
+        query: searchQuery,
+        category: selectedCategory,
+        sort: sortOption,
+        page: currentPage + 1
+      }));
+    }
+  }, [dispatch, status, currentPage, searchQuery, selectedCategory, sortOption]);
 
-  useEffect(() => {
-    dispatch(fetchProducts({ query, category, sort, page }));
-  }, [dispatch, query, category, sort, page]);
+  const lastProductRef = useInfiniteScroll(loadMoreProducts, status === 'loading');
 
   if (status === 'failed') {
     return <div className="text-red-500 text-center my-4">{error}</div>;
@@ -52,16 +51,19 @@ const ProductList = () => {
       {products.map((product, index) => {
         if (index === products.length - 1) {
           return (
-            <div ref={lastProductElementRef} key={product.code}>
+            <div ref={lastProductRef} key={product.code || index}>
               <ProductCard product={product} />
             </div>
           );
         } else {
-          return <ProductCard key={product.code} product={product} />;
+          return <ProductCard key={product.code || index} product={product} />;
         }
       })}
       {status === 'loading' && (
-        <div className="col-span-full text-center my-4">Loading more products...</div>
+        <div className="col-span-full text-center my-4">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent"></div>
+          <p className="mt-2">Loading more products...</p>
+        </div>
       )}
     </div>
   );

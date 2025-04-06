@@ -10,6 +10,7 @@ import {
 import Filter from '../../components/Filter';
 import Sort from '../../components/Sort';
 import ProductList from '../../components/ProductList';
+import Search from '../../components/Search';
 
 const ProductsPage = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,8 @@ const ProductsPage = () => {
   const sort = useSelector(selectSortOption);
 
   useEffect(() => {
+    // Only fetch products on initial load, not on page changes
+    // Page changes are handled by the infinite scroll
     dispatch(fetchProducts({ query, category, sort, page: 1 }));
   }, [dispatch, query, category, sort]);
 
@@ -36,7 +39,7 @@ const ProductsPage = () => {
             <Sort />
             <button 
               onClick={handleResetFilters}
-              className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+              className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 mt-4"
             >
               Reset Filters
             </button>

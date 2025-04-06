@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
 const BASE_URL = 'https://world.openfoodfacts.org';
 
-// Async thunk for fetching products
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async ({ query, category, sort, page = 1, pageSize = 24 }) => {
@@ -30,52 +30,64 @@ export const fetchProducts = createAsyncThunk(
           url += '&sort_by=nutrition_grade_fr&sort_order=desc';
           break;
         default:
-          // Default sort
           url += '&sort_by=popularity_key&sort_order=desc';
       }
     }
     
     url += `&page=${page}&page_size=${pageSize}`;
     
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch products');
+    try {
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
     }
-    
-    return await response.json();
   }
 );
 
-// Async thunk for fetching a single product by barcode
 export const fetchProductByBarcode = createAsyncThunk(
   'products/fetchProductByBarcode',
   async (barcode) => {
-    const response = await fetch(`${BASE_URL}/api/v0/product/${barcode}.json`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch product');
+    try {
+      const response = await fetch(`${BASE_URL}/api/v0/product/${barcode}.json`);
+      
+      if (!response.ok) {
+        throw new Error('Product not found');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching product by barcode:', error);
+      throw error;
     }
-    
-    return await response.json();
   }
 );
 
-// Async thunk for fetching categories
 export const fetchCategories = createAsyncThunk(
   'products/fetchCategories',
   async () => {
-    const response = await fetch(`${BASE_URL}/categories.json`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch categories');
+    try {
+      const response = await fetch(`${BASE_URL}/categories.json`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
     }
-    
-    return await response.json();
   }
 );
 
-const productSlice = createSlice({
+const productsSlice = createSlice({
   name: 'products',
   initialState: {
     items: [],
@@ -125,9 +137,24 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.items = action.payload.products || [];
+        
+        // Check if this is the first page or a subsequent page
+        if (action.meta.arg.page === 1) {
+          // First page: replace the items array
+          state.items = action.payload.products || [];
+        } else {
+          // Subsequent pages: append to existing items
+          // Optionally prevent duplicates
+          const existingProductCodes = new Set(state.items.map(item => item.code));
+          const newProducts = (action.payload.products || []).filter(
+            product => !existingProductCodes.has(product.code)
+          );
+          
+          state.items = [...state.items, ...newProducts];
+        }
+        
         state.count = action.payload.count || 0;
-        state.page = action.payload.page || 1;
+        state.page = action.meta.arg.page || 1;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed';
@@ -168,9 +195,9 @@ export const {
   setSortOption,
   setPage,
   resetFilters
-} = productSlice.actions;
+} = productsSlice.actions;
 
-export default productSlice.reducer;
+export default productsSlice.reducer;
 
 // Selectors
 export const selectAllProducts = (state) => state.products.items;
@@ -178,6 +205,7 @@ export const selectProductsStatus = (state) => state.products.status;
 export const selectProductsError = (state) => state.products.error;
 export const selectProductsCount = (state) => state.products.count;
 export const selectCurrentPage = (state) => state.products.page;
+export const selectPageSize = (state) => state.products.pageSize;
 export const selectSearchQuery = (state) => state.products.searchQuery;
 export const selectSelectedCategory = (state) => state.products.selectedCategory;
 export const selectSortOption = (state) => state.products.sortOption;

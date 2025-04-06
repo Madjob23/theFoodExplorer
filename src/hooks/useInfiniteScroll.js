@@ -1,24 +1,26 @@
 import { useRef, useCallback, useEffect } from 'react';
 
-const useInfiniteScroll = (callback, isFetching) => {
+const useInfiniteScroll = (loadMore, isLoading) => {
   const observer = useRef();
   
   const lastElementRef = useCallback(node => {
-    if (isFetching) return;
+    if (isLoading) return;
     if (observer.current) observer.current.disconnect();
     
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        callback();
+      if (entries[0].isIntersecting && entries[0].isIntersecting) {
+        loadMore();
       }
-    }, { threshold: 0.5 });
+    }, {
+      rootMargin: '0px 0px 500px 0px', // Load more when within 500px of the bottom
+      threshold: 0.1 // Trigger when 10% of the element is visible
+    });
     
     if (node) observer.current.observe(node);
-  }, [callback, isFetching]);
+  }, [loadMore, isLoading]);
   
-  // Add cleanup using useEffect
+  // Cleanup observer on unmount
   useEffect(() => {
-    // Cleanup function to disconnect the observer when component unmounts
     return () => {
       if (observer.current) {
         observer.current.disconnect();
