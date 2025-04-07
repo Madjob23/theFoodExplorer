@@ -2,6 +2,31 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const BASE_URL = 'https://world.openfoodfacts.org';
 
+// for suggestions during searching by name
+export const fetchSearchSuggestions = createAsyncThunk(
+  'products/fetchSearchSuggestions',
+  async (query) => {
+    if (!query || query.length < 2) return { products: [] };
+    
+    try {
+      // Use the same search endpoint but limit results and only return minimal data
+      const url = `${BASE_URL}/cgi/search.pl?action=process&json=true&page_size=5&search_terms=${encodeURIComponent(query)}`;
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch suggestions');
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      return { products: [] };
+    }
+  }
+);
+
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async ({ query, category, sort, page = 1, pageSize = 24 }) => {
@@ -104,7 +129,9 @@ const productsSlice = createSlice({
     categoriesError: null,
     searchQuery: '',
     selectedCategory: '',
-    sortOption: 'popularity'
+    sortOption: 'popularity',
+    suggestions: [],
+    suggestionsStatus: 'idle',
   },
   reducers: {
     setSearchQuery: (state, action) => {
@@ -185,6 +212,19 @@ const productsSlice = createSlice({
       .addCase(fetchCategories.rejected, (state, action) => {
         state.categoriesStatus = 'failed';
         state.categoriesError = action.error.message;
+      })
+
+      // Handle fetchSearchSuggestions states
+      .addCase(fetchSearchSuggestions.pending, (state) => {
+        state.suggestionsStatus = 'loading';
+      })
+      .addCase(fetchSearchSuggestions.fulfilled, (state, action) => {
+        state.suggestionsStatus = 'succeeded';
+        state.suggestions = action.payload.products || [];
+      })
+      .addCase(fetchSearchSuggestions.rejected, (state) => {
+        state.suggestionsStatus = 'failed';
+        state.suggestions = [];
       });
   }
 });
@@ -200,6 +240,8 @@ export const {
 export default productsSlice.reducer;
 
 // Selectors
+export const selectSearchSuggestions = (state) => state.products.suggestions;
+export const selectSuggestionsStatus = (state) => state.products.suggestionsStatus;
 export const selectAllProducts = (state) => state.products.items;
 export const selectProductsStatus = (state) => state.products.status;
 export const selectProductsError = (state) => state.products.error;
