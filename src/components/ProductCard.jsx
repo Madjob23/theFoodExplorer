@@ -20,7 +20,7 @@ const ProductCard = ({ product }) => {
     const style = gradeMap[gradeKey] || gradeMap.unknown;
     
     return (
-      <span className={`${style.bg} ${style.text} px-2 py-1 rounded font-bold text-sm`}>
+      <span title='Nutrition grade' className={`${style.bg} ${style.text} px-2 py-1 rounded font-bold text-sm`}>
         {grade ? grade.toUpperCase() : '?'}
       </span>
     );
@@ -39,7 +39,7 @@ const ProductCard = ({ product }) => {
           </div>
           <div className="p-4">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="font-bold text-lg truncate">
+              <h3 title={product.product_name || 'Unknown Product'} className="font-bold text-lg truncate">
                 {product.product_name || 'Unknown Product'}
               </h3>
               {getNutritionBadge(product.nutrition_grade_fr)}
