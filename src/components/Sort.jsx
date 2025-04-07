@@ -1,16 +1,23 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  setSortOption,
-  selectSortOption
-} from '../features/products/productSlice';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { selectSortOption } from '../features/products/productSlice';
 
-const Sort = () => {
-  const dispatch = useDispatch();
-  const sortOption = useSelector(selectSortOption);
+const Sort = ({ onSortChange, initialSort }) => {
+  const reduxSortOption = useSelector(selectSortOption);
+  const [sortOption, setSortOption] = useState(initialSort || reduxSortOption);
+
+  // Update local state when prop changes (for reset functionality)
+  useEffect(() => {
+    setSortOption(initialSort || reduxSortOption);
+  }, [initialSort, reduxSortOption]);
 
   const handleSortChange = (e) => {
-    dispatch(setSortOption(e.target.value));
+    // Only update local state, not Redux
+    setSortOption(e.target.value);
+    // Pass the new value up to parent
+    if (onSortChange) {
+      onSortChange(e.target.value);
+    }
   };
 
   return (
