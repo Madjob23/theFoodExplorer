@@ -29,11 +29,11 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 sticky">
       <div className="flex flex-col md:flex-row md:space-x-6">
         {/* Left sidebar for filters */}
         <div className="w-full md:w-1/4 mb-6 md:mb-0">
-          <div className="bg-white p-4 rounded shadow">
+          <div className="sticky top-0 bg-white p-4 rounded shadow">
             <h2 className="text-xl font-bold mb-4">Filters</h2>
             <Filter />
             <Sort />
@@ -48,6 +48,15 @@ const ProductsPage = () => {
         
         {/* Main content area */}
         <div className="w-full md:w-3/4">
+        <div className="container mx-auto px-4 py-6">
+            <h1 className="text-2xl font-bold text-center">Discover food products. Know everything about 'em.</h1>
+          </div>
+          <div className="container mx-auto px-4 py-3 flex flex-col items-center">
+            <p className="text-gray-600 text-xl mb-4">Browse through our collection of food products.</p>
+            <p className="text-gray-600 text-xl mb-4">Search specific products by name or by barcode.</p>
+            <p className="text-gray-600 text-xl mb-4">Click on a product card to get detailed facts about it.</p>
+            <p className="text-gray-600 text-xl mb-4">Add selected products to your cart and manage their quantity.</p>
+          </div>
           <div className="mb-4">
             <h1 className="text-2xl font-bold">
               {query ? `Search: "${query}"` : category ? `Category: ${category}` : 'All Products'}
