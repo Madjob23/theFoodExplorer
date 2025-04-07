@@ -67,14 +67,6 @@ const Search = () => {
     
     setShowSuggestions(false);
   };
-  
-  const handleSuggestionClick = (productName) => {
-    setInput(productName);
-    dispatch(setSearchQuery(productName));
-    dispatch(fetchProducts({ query: productName, page: 1 }));
-    navigate('/');
-    setShowSuggestions(false);
-  };
 
   return (
     <form onSubmit={handleSubmit} className="w-full md:max-w-96">
@@ -128,7 +120,7 @@ const Search = () => {
                     <li 
                       key={product.code}
                       className="py-2 px-3 hover:bg-blue-50 cursor-pointer flex items-center"
-                      onClick={() => handleSuggestionClick(product.product_name)}
+                      onClick={() => navigate(`/product/${product.code}`)}
                     >
                       {product.image_small_url && (
                         <img 
